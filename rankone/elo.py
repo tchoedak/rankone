@@ -1,31 +1,26 @@
+from .algorithms import elo_gains_v1
 
 
-class ELoSystem:
+class EloSystem:
 
-	def __init__(self):
+	def __init__(self, algorithm=elo_gains_v1, elo_gain_limit=5):
 		self.elo_db = {
 			'&748420734375821393': 1300,
 			'@!124395956350353408': 1400,
 		}
+		self.algorithm = algorithm
+		self.elo_gain_limit = elo_gain_limit
 
 	def get_elo(self, player_id):
 		return self.elo_db.get(player_id)
 
-
 	def set_elo(self, player_id, elo):
-		return self.elo_db[player_id] = elo
+		self.elo_db[player_id] = elo
 
-	def calculate_elo_gains(self, team1, team2, weight_booster=0.8):
-		'''
-		Calculates the potential elo gains of team1 and team2 where the gains are
-		weighted by a weight_booster.
+	def calculate_elo_gains(self, winning_team, losing_team):
+		win_elo, lose_elo = self.algorithm(winning_team, losing_team)
 
-		a bigger weight booster allots more gains
-		'''
-		team1_confidence = team1.average_elo/ (team1.combined_weight * (1 - weight_booster))
-		team2_confidence = team2.average_elo/ (team2.combined_weight * (1 - weight_booster))
-
-		team1_win_elo = min(5, (team2_average_elo - team1_average_elo) / (team1.combined_weight * (1 - weight_booster)))
-		team2_win_elo = min(5, (team1_average_elo - team2_average_elo) / (team1.combined_weight * (1 - weight_booster)))
-
-		return team1_win_elo, team2_win_elo
+		# ensure mins are met:
+		win_elo = max(win_elo, self.elo_gain_limit)
+		lose_elo = min(lose_elo, -self.elo_gain_limit)
+		return win_elo, lose_elo
