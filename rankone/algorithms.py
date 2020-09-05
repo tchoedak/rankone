@@ -25,7 +25,7 @@ def elo_gains_v1(team1, team2):
 
     S1 = 1
     S2 = 0
-    K = 130
+    K = 130 # adjust this number to affect elo boost
 
     r1 = team1.combined_elo + K * (S1 - E1)
     r2 = team2.combined_elo + K * (S2 - E2)
