@@ -5,3 +5,4 @@ class Match(object):
         self.match_created_at = match_created_at
         self.red_players = None
         self.blue_players = None
+        self.winning_team = Nones

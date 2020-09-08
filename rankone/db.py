@@ -1,5 +1,6 @@
 from datetime import datetime
 import pandas as pd
+import uuid
 
 from sqlalchemy.engine.url import URL
 from sqlalchemy.schema import Column
@@ -92,18 +93,53 @@ def set_winner(match_id, winning_team):
     session.query(Match).filter(Match.match_id == match_id).filter(
         Match.team != winning_team
     ).update(lose)
+    session.commit()
     return True
 
 
 def get_match(match_id):
-    '''
-	Retrieve a match query result!
-	'''
     match = session.query(Match).filter(Match.match_id == match_id)
     return match
 
 
+def get_player(player_id):
+    player = session.query(Player).filter(Player.id == player_id).first()
+    return player
+
+
 def show_db():
-    results = [result.__dict__ for result in db.session.query(db.Match).all()]
+    results = [result.__dict__ for result in session.query(Match).all()]
     df = pd.DataFrame(results)
     print(df[['match_id', 'player_id', 'team', 'win']])
+
+
+def show_players():
+    results = [result.__dict__ for result in session.query(Player).all()]
+    df = pd.DataFrame(results)
+    print(df[['id', 'name', 'elo']])
+
+
+def register_players(players):
+    '''
+	Checks if players exist in Player table. If not, adds them to the Player table.
+	'''
+    for player in players:
+        instance = session.query(Player).filter(Player.id == player.player_id).first()
+        if not instance:
+            p = Player(id=player.player_id, name=player.name, updated_at=datetime.now())
+            session.add(p)
+            session.commit()
+    return True
+
+
+def update_player_elo(players, elo_adjustment):
+    '''
+	Updates a player's elo by player.elo + elo_adjustment
+	for every player in `players`.
+	'''
+    for player in players:
+        db_player = session.query(Player).filter(Player.id == player.player_id).first()
+        if db_player:
+            db_player.elo = db_player.elo + elo_adjustment
+            session.commit()
+    return True
