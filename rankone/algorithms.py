@@ -1,4 +1,9 @@
 def threshold_elo_gains(team1, team2):
+    '''
+    Returns 40, -40 elo gains IF the respective teams
+    have less than 100 total combined games. Otherwise
+    returns 15, -15.
+    '''
     threshold = 100
 
     team1_elo, team2_elo = 15, -15
@@ -16,6 +21,10 @@ def basic_elo_gains(team1, team2):
 
 
 def elo_gains_v1(team1, team2):
+    '''
+    Calculates using an ELO formula but does not take into account
+    the number of games.
+    '''
     # team1 wins
     R1 = 10 ** (team1.combined_elo / 400)
     R2 = 10 ** (team2.combined_elo / 400)
@@ -25,7 +34,7 @@ def elo_gains_v1(team1, team2):
 
     S1 = 1
     S2 = 0
-    K = 130 # adjust this number to affect elo boost
+    K = 130  # adjust this number to affect elo boost
 
     r1 = team1.combined_elo + K * (S1 - E1)
     r2 = team2.combined_elo + K * (S2 - E2)
