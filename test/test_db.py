@@ -1,8 +1,9 @@
 from datetime import datetime
 import pytest
+from rankone import db
 
 
-def test_add_match(db, balanced_teams):
+def test_add_match(balanced_teams):
     red, blue = balanced_teams
     match_one_id = 123456
 

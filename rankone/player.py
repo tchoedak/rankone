@@ -17,7 +17,10 @@ class Player(object):
         '''
         Returns the player's current Elo from ranked games
         '''
-        return db.get_player(self.player_id).elo
+        if self._elo:
+            return self._elo
+        else:
+            return db.get_player(self.player_id).elo
 
     @property
     def number_of_games(self):
