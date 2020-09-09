@@ -1,4 +1,3 @@
-import commands
 from .bot import bot
 from .config import TOKEN
 

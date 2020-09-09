@@ -1,9 +1,10 @@
 import random
 import discord
 from discord.ext import commands
-import db
-import config
-import utils
+
+from . import db
+from . import config
+from . import utils
 
 
 # these aren't working WTF?

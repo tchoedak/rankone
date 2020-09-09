@@ -12,6 +12,7 @@ from .algorithms import elo_gains_v1
 from . import reporter
 from . import db
 from . import config
+from . import parser
 
 
 logger = get_logger(logging.INFO)

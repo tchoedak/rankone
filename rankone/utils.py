@@ -34,5 +34,3 @@ def restore_db(backup_id):
     else:
         response = f'Backup {backup_id} does not exist'
     return response
-
-
