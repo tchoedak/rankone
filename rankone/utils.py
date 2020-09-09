@@ -1,7 +1,8 @@
 from datetime import datetime
-import db
 import os
 import subprocess
+
+from . import db
 
 
 class BackUp(object):
@@ -28,8 +29,18 @@ def restore_db(backup_id):
     if bk_up.exists:
         new_bk_id = backup_db()
         restore_cmd = ['cp', bk_up.backup_path, db.sqlite_db['database']]
-        print(restore_cmd)
-        response = f'New backup {new_bk_id} created. Backup {backup_id} restored.'
+        result = subprocess.call(restore_cmd)
+        if result == 0:
+            response = f'New backup {new_bk_id} created. Backup {backup_id} restored.'
+        else:
+            response = 'Failed to restore backup'
     else:
         response = f'Backup {backup_id} does not exist'
     return response
+
+
+def reset_db():
+    cmd = ['rm', db.sqlite_db['database']]
+    result = subprocess.call(cmd) == 0
+    db.session = db.get_session()
+    return result

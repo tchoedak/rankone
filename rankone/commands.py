@@ -1,12 +1,11 @@
 import random
 import discord
 from discord.ext import commands
-import db
-import config
-import utils
 
-
-# these aren't working WTF?
+from . import db
+from . import config
+from . import utils
+from . import reporter
 
 
 class Commands(commands.Cog):
@@ -21,14 +20,13 @@ class Commands(commands.Cog):
             str(random.choice(range(1, number_of_sides + 1)))
             for _ in range(number_of_dice)
         ]
-        await ctx.send(', '.join(dice))
+        await ctx.send(reporter.as_bot(', '.join(dice)))
 
     @commands.command(name='create_channel')
     async def create_channel(self, ctx, channel_name='real-python'):
         guild = ctx.guild
         existing_channel = discord.utils.get(guild.channels, name=channel_name)
         if not existing_channel:
-            print(f'Creating a new channel: {channdel_name}')
             await guild.create_text_channel(channel_name)
 
     @commands.command(name='show_matches')
@@ -43,9 +41,60 @@ class Commands(commands.Cog):
     @commands.has_any_role(config.ADMIN_ROLE)
     async def backup_db(self, ctx, backup_id: str = None):
         backup_id = utils.backup_db(backup_id)
-        await ctx.send(f'Backup created! backup_id: {backup_id}')
+        await ctx.send(reporter.as_bot(f'Backup created! backup_id: {backup_id}'))
 
     @commands.command(name='restore_db')
     @commands.has_any_role(config.ADMIN_ROLE)
-    async def restore_db(self, ctx, backup_id: int):
-        pass
+    async def restore_db(self, ctx, backup_id: str):
+        response = utils.restore_db(backup_id)
+        await ctx.send(reporter.as_bot(response))
+
+    @commands.command(name='myelo')
+    async def myelo(self, ctx):
+        player_id = ctx.author.id
+        player = db.get_player(player_id)
+        report = reporter.get_elo_report(player)
+        await ctx.send(report)
+
+    @commands.command(name='elo')
+    async def elo(self, ctx):
+        player_ids = [mention.id for mention in ctx.message.mentions]
+        if player_ids:
+            players = list(
+                filter(None, [db.get_player(player_id) for player_id in player_ids])
+            )
+            if players:
+                report = reporter.get_elo_report(*players)
+            else:
+                report = reporter.as_bot("Players don't exist")
+        await ctx.send(report)
+
+    @commands.command(name='reset_db')
+    @commands.has_any_role(config.ADMIN_ROLE)
+    async def reset_db(self, ctx):
+        backup_id = utils.backup_db()
+        response = f'Backup {backup_id} created first before resetting elo\n'
+        if utils.reset_db():
+            response = response + 'DB reset.'
+        else:
+            response = response = 'Unable to reset DB'
+        await ctx.send(reporter.as_bot(response))
+
+    @commands.command(name='reset_elo')
+    @commands.has_any_role(config.ADMIN_ROLE)
+    async def reset_elo(self, ctx):
+        backup_id = utils.backup_db()
+        await ctx.send(
+            reporter.as_bot(f'Backup {backup_id} created first before resetting elo\n')
+        )
+        if db.reset_all_elo():
+            response = 'Elo reset successful'
+        else:
+            response = 'Elo reset unsuccessful'
+        await ctx.send(reporter.as_bot(response))
+
+    @commands.command(name='elo_leaders')
+    async def elo_leaders(self, ctx):
+        top_limit = 10
+        leaders = db.get_top_n_players(top_limit)
+        await ctx.send(reporter.get_leader_report(leaders))

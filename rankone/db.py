@@ -8,15 +8,12 @@ from sqlalchemy.types import String, DateTime, Boolean, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import update
 
 
 STARTING_ELO = 1400
 
 sqlite_db = {'drivername': 'sqlite', 'database': 'db.sqlite'}
-engine = create_engine(URL(**sqlite_db))
-_Session = sessionmaker()
-_Session.configure(bind=engine)
-session = _Session()
 
 Base = declarative_base()
 
@@ -42,9 +39,18 @@ class Match(Base):
     created_at = Column(DateTime)
 
 
-# create tables if not exists
-Player.__table__.create(bind=engine, checkfirst=True)
-Match.__table__.create(bind=engine, checkfirst=True)
+def get_session():
+    engine = create_engine(URL(**sqlite_db))
+    _Session = sessionmaker()
+    _Session.configure(bind=engine)
+
+    # create tables if not exists
+    Player.__table__.create(bind=engine, checkfirst=True)
+    Match.__table__.create(bind=engine, checkfirst=True)
+    return _Session()
+
+
+session = get_session()
 
 
 def add_match(red, blue, message_id, match_created_at):
@@ -143,3 +149,16 @@ def update_player_elo(players, elo_adjustment):
             db_player.elo = db_player.elo + elo_adjustment
             session.commit()
     return True
+
+
+def reset_all_elo():
+    session.execute(
+        update(Player.__table__, values={Player.__table__.c.elo: STARTING_ELO})
+    )
+    session.commit()
+    return True
+
+
+def get_top_n_players(n):
+    top_players = session.query(Player).order_by(Player.elo.desc()).limit(n)
+    return top_players.all()

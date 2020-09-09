@@ -1,4 +1,4 @@
-from algorithms import elo_gains_v1
+from .algorithms import elo_gains_v1
 
 
 class EloSystem:
