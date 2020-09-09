@@ -1,6 +1,6 @@
 import random
-import db
-from config import BOT_MESSAGE_PREFIX
+from . import db
+from .config import BOT_MESSAGE_PREFIX
 
 
 def bot_message(func):
