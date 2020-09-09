@@ -1,6 +1,6 @@
 import commands
-from bot import bot
-from config import TOKEN
+from .bot import bot
+from .config import TOKEN
 
 
 def start():
