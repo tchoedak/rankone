@@ -67,8 +67,6 @@ async def on_message(message):
             match_created_at = message.created_at
             db.add_match(teams['Red'], teams['Blue'], match_id, match_created_at)
             db.register_players(teams['Red'].players + teams['Blue'].players)
-            db.show_db()
-            db.show_players()
             await send_to_log_channel(
                 f"Matched added! match_id: {match_id}\nRed: {teams['Red']}\nBlue: {teams['Blue']}"
             )
@@ -84,7 +82,6 @@ async def on_reaction_add(reaction, user):
             ).pop()
             match_id = reaction.message.id
             db.set_winner(match_id, winning_team)
-            db.show_db()
 
             match_id, players, teams = parser.parse_match(
                 reaction.message.id, reaction.message.content, reaction.message.mentions
@@ -94,7 +91,6 @@ async def on_reaction_add(reaction, user):
             )
             db.update_player_elo(teams[winning_team].players, win_elo)
             db.update_player_elo(teams[losing_team].players, lose_elo)
-            db.show_players()
             await reaction.message.channel.send(
                 reporter.get_elo_report(*players, has_updated=True)
             )

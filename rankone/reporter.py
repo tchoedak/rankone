@@ -37,5 +37,5 @@ def get_leader_report(players):
     # assumes players are already sorted in descending
     report = f'Top {len(players)} players: \n'
     for i, player in enumerate(players):
-        report = report + f'{i+1}. {player.name} [{player.elo}]\n'
+        report = report + f'{i+1}. {player.name} [{player.elo:4.0f}]\n'
     return report
