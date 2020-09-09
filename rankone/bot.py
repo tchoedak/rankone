@@ -5,14 +5,14 @@ import logging
 import discord
 from discord.ext import commands
 
-from logger import get_logger
-from commands import Commands
-import reporter
-from elo import EloSystem
-from algorithms import elo_gains_v1
-import parser
-import db
-import config
+from .logger import get_logger
+from .commands import Commands
+from .elo import EloSystem
+from .algorithms import elo_gains_v1
+from . import reporter
+from . import db
+from . import config
+
 
 logger = get_logger(logging.INFO)
 
