@@ -24,7 +24,7 @@ elo = EloSystem(algorithm=elo_gains_v1)
 async def send_to_log_channel(message):
     log_channel = bot.get_channel(config.LOG_CHANNEL)
 
-    await log_channel.send(message)
+    await log_channel.send(config.BOT_MESSAGE_PREFIX + message)
 
 
 @bot.event
