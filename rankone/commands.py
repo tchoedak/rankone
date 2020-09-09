@@ -67,7 +67,8 @@ class Commands(commands.Cog):
                 report = reporter.get_elo_report(*players)
             else:
                 report = reporter.as_bot("Players don't exist")
-        await ctx.send(report)
+
+            await ctx.send(report)
 
     @commands.command(name='reset_db')
     @commands.has_any_role(config.ADMIN_ROLE)
