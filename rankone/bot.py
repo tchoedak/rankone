@@ -95,7 +95,9 @@ async def on_reaction_add(reaction, user):
             db.update_player_elo(teams[winning_team].players, win_elo)
             db.update_player_elo(teams[losing_team].players, lose_elo)
             db.show_players()
-            await reaction.message.channel.send(reporter.get_elo_report(players))
+            await reaction.message.channel.send(
+                reporter.get_elo_report(*players, has_updated=True)
+            )
             await send_to_log_channel(
                 f'Match updated!\nmatch_id: {match_id}. winner: {winning_team}. elo_gain: {win_elo:5.0f}'
             )
