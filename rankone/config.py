@@ -18,3 +18,6 @@ LOG_CHANNEL = int(os.getenv('DISCORD_LOG_CHANNEL'))
 # The Bot will always prefix every message it sends to a channel with this prefix.
 # This is used to make it easy to distinguish bot messages from other bots or from real users.
 BOT_MESSAGE_PREFIX = ':robot: '
+
+DEBUG_MODE = os.getenv('DISCORD_DEBUG_MODE') == 'ENABLED'
+DEBUG_CHANNEL = os.getenv('DISCORD_DEBUG_CHANNEL')

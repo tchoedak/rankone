@@ -13,7 +13,7 @@ with open('requirements.txt', 'r') as f:
 
 setup(
     name='rankone',
-    version='0.0.2',
+    version='0.0.3',
     packages=pkgs,
     description='RankOne is a discord bot that manages a Elo ladder for pickup games.',
     long_description=README,
