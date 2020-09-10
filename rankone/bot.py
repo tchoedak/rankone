@@ -24,7 +24,6 @@ elo = EloSystem(algorithm=elo_gains_v1)
 
 async def send_to_log_channel(message):
     log_channel = bot.get_channel(config.LOG_CHANNEL)
-
     await log_channel.send(config.BOT_MESSAGE_PREFIX + message)
 
 
@@ -72,12 +71,14 @@ async def on_message(message):
             match_created_at = message.created_at
             db.add_match(teams['Red'], teams['Blue'], match_id, match_created_at)
             db.register_players(teams['Red'].players + teams['Blue'].players)
-            match_added_message = f"Matched added! match_id: {match_id}\nRed: {teams['Red']}\nBlue: {teams['Blue']}"
+            match_added_message = reporter.as_bot(
+                f"Matched added! match_id [{match_id}]. Red: {teams['Red']}. Blue: [{teams['Blue']}]"
+            )
             if config.DEBUG_MODE:
-                send_to_debug_channel(match_added_message)
+                await send_to_debug_channel(match_added_message)
             else:
-                send_to_log_channel(
-                    f"Matched added! match_id: {match_id}\nRed: {teams['Red']}\nBlue: {teams['Blue']}"
+                await send_to_log_channel(
+                    f"Matched added! match_id: [{match_id}]. Red: [{teams['Red']}]. Blue: [{teams['Blue']}]"
                 )
 
 
@@ -102,10 +103,12 @@ async def on_reaction_add(reaction, user):
             db.update_player_elo(teams[losing_team].players, lose_elo)
 
             elo_report_message = reporter.get_elo_report(*players, has_updated=True)
-            match_updated_message = f'Match updated!\nmatch_id: {match_id}. winner: {winning_team}. elo_gain: {win_elo:5.0f}'
+            match_updated_message = reporter.as_bot(
+                f'Match updated! match_id: [{match_id}]. winner: [{winning_team}]. elo_gain: [{win_elo:5.0f}]'
+            )
             if config.DEBUG_MODE:
-                send_to_debug_channel(message)
-                send_to_debug_channel(match_updated_message)
+                await send_to_debug_channel(elo_report_message)
+                await send_to_debug_channel(match_updated_message)
             else:
                 await reaction.message.channel.send(elo_report_message)
-                send_to_log_channel(match_updated_message)
+                await send_to_log_channel(match_updated_message)
