@@ -30,7 +30,7 @@ async def send_to_log_channel(message):
 
 @bot.event
 async def on_ready():
-    guild = discord.utils.get(bot.guilds, name=config.GUILD)
+    guild = discord.utils.get(bot.guilds, id=config.GUILD_ID)
 
     print(
         f'{bot.user} is connected to the following guild:\n'
