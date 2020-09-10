@@ -1,7 +1,7 @@
 import os
 
 
-GUILD_ID = os.getenv('DISCORD_GUILD_ID')
+GUILD_ID = int(os.getenv('DISCORD_GUILD_ID'))
 TOKEN = os.getenv('DISCORD_TOKEN')
 ADMIN_ROLE = os.getenv('DISCORD_ADMIN_ROLE')
 
@@ -13,7 +13,7 @@ MONITORED_CHANNELS = [
 ]
 
 # CHANNEL_ID of the channel where any channel level logs will go
-LOG_CHANNEL = os.getenv('DISCORD_LOG_CHANNEL')
+LOG_CHANNEL = int(os.getenv('DISCORD_LOG_CHANNEL'))
 
 # The Bot will always prefix every message it sends to a channel with this prefix.
 # This is used to make it easy to distinguish bot messages from other bots or from real users.
