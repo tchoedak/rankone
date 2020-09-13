@@ -108,6 +108,12 @@ def get_match(match_id):
     return match
 
 
+def get_match_winner(match_id):
+    match = get_match(match_id)
+    winner = match.filter(Match.win == True).distinct().first()
+    return winner
+
+
 def get_player(player_id):
     player = session.query(Player).filter(Player.id == player_id).first()
     return player

@@ -87,28 +87,35 @@ async def on_reaction_add(reaction, user):
     if reaction.message.channel.id in config.MONITORED_CHANNELS:
         winning_team = config.monitored_reactions.get(reaction.emoji)
         if winning_team:
-            losing_team = (
-                set(config.monitored_reactions.values()) - set([winning_team])
-            ).pop()
+
             match_id = reaction.message.id
-            db.set_winner(match_id, winning_team)
 
-            match_id, players, teams = parser.parse_match(
-                reaction.message.id, reaction.message.content, reaction.message.mentions
-            )
-            win_elo, lose_elo = elo.calculate_elo_gains(
-                teams[winning_team], teams[losing_team]
-            )
-            db.update_player_elo(teams[winning_team].players, win_elo)
-            db.update_player_elo(teams[losing_team].players, lose_elo)
+            # check if match already has a winner
+            match_winner = db.get_match_winner(match_id)
+            if not match_winner or match_winner.team != winning_team:
+                losing_team = (
+                    set(config.monitored_reactions.values()) - set([winning_team])
+                ).pop()
+                db.set_winner(match_id, winning_team)
 
-            elo_report_message = reporter.get_elo_report(*players, has_updated=True)
-            match_updated_message = reporter.as_bot(
-                f'Match updated! match_id: [{match_id}]. winner: [{winning_team}]. elo_gain: [{win_elo:5.0f}]'
-            )
-            if config.DEBUG_MODE:
-                await send_to_debug_channel(elo_report_message)
-                await send_to_debug_channel(match_updated_message)
-            else:
-                await reaction.message.channel.send(elo_report_message)
-                await send_to_log_channel(match_updated_message)
+                match_id, players, teams = parser.parse_match(
+                    reaction.message.id,
+                    reaction.message.content,
+                    reaction.message.mentions,
+                )
+                win_elo, lose_elo = elo.calculate_elo_gains(
+                    teams[winning_team], teams[losing_team]
+                )
+                db.update_player_elo(teams[winning_team].players, win_elo)
+                db.update_player_elo(teams[losing_team].players, lose_elo)
+
+                elo_report_message = reporter.get_elo_report(*players, has_updated=True)
+                match_updated_message = reporter.as_bot(
+                    f'Match updated! match_id: [{match_id}]. winner: [{winning_team}]. elo_gain: [{win_elo:5.0f}]'
+                )
+                if config.DEBUG_MODE:
+                    await send_to_debug_channel(elo_report_message)
+                    await send_to_debug_channel(match_updated_message)
+                else:
+                    await reaction.message.channel.send(elo_report_message)
+                    await send_to_log_channel(match_updated_message)
