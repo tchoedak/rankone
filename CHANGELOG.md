@@ -5,6 +5,10 @@ Please log all key deployments here. They include all major changes and customiz
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### [1.0.2] - 2020-09-19
+### Changed
+- Update all reports to display `display_name`s instead of discord member name.
+
 ### [1.0.1] - 2020-09-18
 ### Changed
 - Updated matches to only be recorded and monitored for game modes that are configured in `config.MONITORED_GAME_MODES`.
