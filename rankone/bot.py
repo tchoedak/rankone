@@ -64,7 +64,9 @@ async def on_message(message):
 
     if message.channel.id in config.MONITORED_CHANNELS:
         await bot.process_commands(message)
-        if parser.is_match(message.content.lower()):
+        if parser.is_match(message.content.lower()) and parser.is_monitored_match(
+            message.mentions
+        ):
             match_id, players, teams = parser.parse_match(
                 message.id, message.content, message.mentions
             )

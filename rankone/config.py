@@ -12,6 +12,11 @@ MONITORED_CHANNELS = [
     int(channel_id) for channel_id in os.getenv('DISCORD_MONITORED_CHANNELS').split(',')
 ]
 
+GAME_MODES_TO_PLAYERS = {'5v5': 10, '4v4': 8, '3v3': 6, '2v2': 4}
+
+MONITORED_GAME_MODES = ['4v4']
+
+
 # CHANNEL_ID of the channel where any channel level logs will go
 LOG_CHANNEL = int(os.getenv('DISCORD_LOG_CHANNEL'))
 

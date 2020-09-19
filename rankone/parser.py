@@ -4,6 +4,7 @@ and converts it to meangingful data so elo and elo gains can be
 calculated
 '''
 from .player import Player, Team
+from . import config
 
 
 def is_match(message_content):
@@ -14,6 +15,18 @@ def is_match(message_content):
         return True
     else:
         return False
+
+
+def is_monitored_match(mentions):
+    '''
+    Returns True if the number of mentions matches
+    the number of expected players for monitored game modes
+    otherwise returns False
+    '''
+    for game_mode in config.MONITORED_GAME_MODES:
+        if len(mentions) == config.GAME_MODES_TO_PLAYERS[game_mode]:
+            return True
+    return False
 
 
 def parse_match(message_id, content, mentions):
