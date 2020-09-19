@@ -119,6 +119,13 @@ def get_player(player_id):
     return player
 
 
+def add_player(player_id, name):
+    player = Player(id=player_id, name=name, updated_at=datetime.now())
+    session.add(player)
+    session.commit()
+    return player
+
+
 def show_db():
     results = [result.__dict__ for result in session.query(Match).all()]
     df = pd.DataFrame(results)

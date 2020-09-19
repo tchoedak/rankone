@@ -36,12 +36,13 @@ class Commands(commands.Cog):
 
     @commands.command(name='myelo')
     async def myelo(self, ctx):
-        player_id = ctx.author.id
+        player_id, name = ctx.author.id, ctx.author.name
         player = db.get_player(player_id)
         if player:
             report = reporter.get_elo_report(player)
         else:
-            report = reporter.as_bot('Player does not exist')
+            player = db.add_player(player_id, name)
+            report = reporter.get_elo_report(player)
         await ctx.send(report)
 
     @commands.command(name='elo')
