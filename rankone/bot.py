@@ -86,7 +86,10 @@ async def on_message(message):
 
 @bot.event
 async def on_reaction_add(reaction, user):
-    if reaction.message.channel.id in config.MONITORED_CHANNELS:
+    if (
+        reaction.message.channel.id in config.MONITORED_CHANNELS
+        and parser.is_monitored_match(reaction.message.mentions)
+    ):
         winning_team = config.monitored_reactions.get(reaction.emoji)
         if winning_team:
 
