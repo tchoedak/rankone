@@ -2,6 +2,8 @@ from datetime import datetime
 import os
 import subprocess
 
+from discord import utils as discord_utils
+
 from . import db
 
 
@@ -44,3 +46,8 @@ def reset_db():
     result = subprocess.call(cmd) == 0
     db.session = db.get_session()
     return result
+
+
+def get_display_name(members, player_id):
+    member = discord_utils.get(members, id=player_id)
+    return member.display_name
