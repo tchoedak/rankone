@@ -14,21 +14,6 @@ class Commands(commands.Cog):
         self._last_member = None
         self.log_channel = bot.get_channel(config.LOG_CHANNEL)
 
-    @commands.command(name='roll_dice')
-    async def roll_dice(self, ctx, number_of_dice: int, number_of_sides: int):
-        dice = [
-            str(random.choice(range(1, number_of_sides + 1)))
-            for _ in range(number_of_dice)
-        ]
-        await ctx.send(reporter.as_bot(', '.join(dice)))
-
-    @commands.command(name='create_channel')
-    async def create_channel(self, ctx, channel_name='real-python'):
-        guild = ctx.guild
-        existing_channel = discord.utils.get(guild.channels, name=channel_name)
-        if not existing_channel:
-            await guild.create_text_channel(channel_name)
-
     @commands.command(name='show_matches')
     async def show_matches(self, ctx):
         db.show_db()
@@ -53,7 +38,10 @@ class Commands(commands.Cog):
     async def myelo(self, ctx):
         player_id = ctx.author.id
         player = db.get_player(player_id)
-        report = reporter.get_elo_report(player)
+        if player:
+            report = reporter.get_elo_report(player)
+        else:
+            report = reporter.as_bot('Player does not exist')
         await ctx.send(report)
 
     @commands.command(name='elo')
