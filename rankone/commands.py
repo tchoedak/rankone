@@ -39,9 +39,15 @@ class Commands(commands.Cog):
         player_id, name = ctx.author.id, ctx.author.name
         player = db.get_player(player_id)
         if player:
+            player.display_name = utils.get_display_name(
+                ctx.guild.members, player_id=int(player_id)
+            )
             report = reporter.get_elo_report(player)
         else:
             player = db.add_player(player_id, name)
+            player.display_name = utils.get_display_name(
+                ctx.guild.members, player_id=int(player_id)
+            )
             report = reporter.get_elo_report(player)
         await ctx.send(report)
 
@@ -52,6 +58,10 @@ class Commands(commands.Cog):
             players = list(
                 filter(None, [db.get_player(player_id) for player_id in player_ids])
             )
+            for player in players:
+                player.display_name = utils.get_display_name(
+                    ctx.guild.members, player_id=int(player.id)
+                )
             if players:
                 report = reporter.get_elo_report(*players)
             else:
@@ -87,4 +97,8 @@ class Commands(commands.Cog):
     async def elo_leaders(self, ctx):
         top_limit = 10
         leaders = db.get_top_n_players(top_limit)
+        for player in leaders:
+            player.display_name = utils.get_display_name(
+                ctx.guild.members, player_id=int(player.id)
+            )
         await ctx.send(reporter.get_leader_report(leaders))
