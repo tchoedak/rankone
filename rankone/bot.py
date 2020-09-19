@@ -13,6 +13,7 @@ from . import reporter
 from . import db
 from . import config
 from . import parser
+from . import utils
 
 
 logger = get_logger(logging.INFO)
@@ -113,6 +114,11 @@ async def on_reaction_add(reaction, user):
                 )
                 db.update_player_elo(teams[winning_team].players, win_elo)
                 db.update_player_elo(teams[losing_team].players, lose_elo)
+
+                for player in players:
+                    player.display_name = utils.get_display_name(
+                        reaction.message.guild.members, player.player_id
+                    )
 
                 elo_report_message = reporter.get_elo_report(*players, has_updated=True)
                 match_updated_message = reporter.as_bot(

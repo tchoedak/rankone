@@ -17,7 +17,7 @@ def bot_message(func):
 @bot_message
 def get_report(players):
     report = ', '.join(
-        [f'{player.name}: {random.randint(900, 1700)}' for player in players]
+        [f'{player.display_name}: {random.randint(900, 1700)}' for player in players]
     )
     return report
 
@@ -25,7 +25,9 @@ def get_report(players):
 @bot_message
 def get_elo_report(*players, has_updated=False):
 
-    report = ', '.join(f'{player.name} [{player.elo:4.0f}]' for player in players)
+    report = ', '.join(
+        f'{player.display_name} [{player.elo:4.0f}]' for player in players
+    )
     header = 'Elo updated! '
     if has_updated:
         report = header + report
@@ -37,5 +39,5 @@ def get_leader_report(players):
     # assumes players are already sorted in descending
     report = f'Top {len(players)} players: \n'
     for i, player in enumerate(players):
-        report = report + f'{i+1}. {player.name} [{player.elo:4.0f}]\n'
+        report = report + f'{i+1}. {player.display_name} [{player.elo:4.0f}]\n'
     return report
