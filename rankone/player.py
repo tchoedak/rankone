@@ -1,4 +1,5 @@
 from . import db
+from trueskill import Rating
 
 
 def avg(items):
@@ -6,11 +7,15 @@ def avg(items):
 
 
 class Player(object):
-    def __init__(self, player_id, name, elo=None, number_of_games=None):
+    def __init__(
+        self, player_id, name, elo=None, number_of_games=None, rating=None, sigma=None
+    ):
         self.player_id = player_id
         self.name = name
         self._elo = elo
         self._number_of_games = number_of_games
+        self._sigma = sigma
+        self._rating = rating
 
     @property
     def elo(self):
@@ -32,6 +37,20 @@ class Player(object):
     def __str__(self):
         return f'<{self.name} id: {self.player_id}>'
 
+    @property
+    def sigma(self):
+        if self._sigma:
+            return self._sigma
+        else:
+            return db.get_player(self.player_id).sigma
+
+    @property
+    def rating(self):
+        if self._rating:
+            return self._rating
+        else:
+            return Rating(mu=self.elo, sigma=self.sigma)
+
 
 class Team(object):
     '''
@@ -52,6 +71,10 @@ class Team(object):
     @property
     def combined_weight(self):
         return sum([player.number_of_games for player in self.players])
+
+    @property
+    def ratings(self):
+        return [player.rating for player in self.players]
 
     def __repr__(self):
         return ', '.join([str(player) for player in self.players])
