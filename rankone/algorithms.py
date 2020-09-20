@@ -5,14 +5,13 @@ trueskill = TrueSkill()
 
 
 def configure_trueskill(mu=None, sigma=None, beta=None, tau=None):
-    if mu:
-        trueskill.mu = mu
-    if sigma:
-        trueskill.sigma = sigma
-    if beta:
-        trueskill.beta = beta
-    if tau:
-        trueskill.tau = tau
+    '''
+    Configure `TrueSkill` with different settings.
+    '''
+    trueskill.mu = mu or trueskill.mu
+    trueskill.sigma = sigma or trueskill.sigma
+    trueskill.beta = beta or trueskill.beta
+    trueskill.tau = tau or trueskill.tau
 
 
 def threshold_elo_gains(team1, team2):
