@@ -4,14 +4,15 @@ import uuid
 
 from sqlalchemy.engine.url import URL
 from sqlalchemy.schema import Column
-from sqlalchemy.types import String, DateTime, Boolean, Integer
+from sqlalchemy.types import String, DateTime, Boolean, Integer, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import update
 
 
-STARTING_ELO = 1400
+from . import config
+
 
 sqlite_db = {'drivername': 'sqlite', 'database': 'db.sqlite'}
 
@@ -23,7 +24,8 @@ class Player(Base):
 
     id = Column(String, primary_key=True)
     name = Column(String)
-    elo = Column(Integer, default=1400)
+    elo = Column(Integer, default=config.STARTING_ELO)
+    sigma = Column(Float, default=config.STARTING_SIGMA)
     updated_at = Column(DateTime)
 
 
@@ -135,7 +137,7 @@ def show_db():
 def show_players():
     results = [result.__dict__ for result in session.query(Player).all()]
     df = pd.DataFrame(results)
-    print(df[['id', 'name', 'elo']])
+    print(df[['id', 'name', 'elo', 'sigma']])
 
 
 def register_players(players):
@@ -151,22 +153,32 @@ def register_players(players):
     return True
 
 
-def update_player_elo(players, elo_adjustment):
+def update_player_elo(players):
     '''
-	Updates a player's elo by player.elo + elo_adjustment
+    Updates the database with the latest player.elo, and player.sigma
 	for every player in `players`.
 	'''
     for player in players:
         db_player = session.query(Player).filter(Player.id == player.player_id).first()
         if db_player:
-            db_player.elo = db_player.elo + elo_adjustment
+            db_player.elo = player.elo
+            db_player.sigma = player.sigma
             session.commit()
     return True
 
 
 def reset_all_elo():
+    '''
+    Reset elo and sigma for ALL players.
+    '''
     session.execute(
-        update(Player.__table__, values={Player.__table__.c.elo: STARTING_ELO})
+        update(
+            Player.__table__,
+            values={
+                Player.__table__.c.elo: config.STARTING_ELO,
+                Player.__table__.c.sigma: config.STARTING_SIGMA,
+            },
+        )
     )
     session.commit()
     return True
