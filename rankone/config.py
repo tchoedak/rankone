@@ -16,7 +16,8 @@ GAME_MODES_TO_PLAYERS = {'5v5': 10, '4v4': 8, '3v3': 6, '2v2': 4, '1v1': 2}
 MONITORED_GAME_MODES = ['4v4']
 
 STARTING_ELO = 1400
-STARTING_SIGMA = 100
+STARTING_SIGMA = 300
+TRUESKILL_SETTINGS = {'BETA': 500}  # this was chosen from simulations
 
 
 # CHANNEL_ID of the channel where any channel level logs will go
