@@ -1,8 +1,10 @@
 from .bot import bot
-from .config import TOKEN
+from .algorithms import configure_trueskill
+from .config import TOKEN, TRUESKILL_SETTINGS
 
 
 def start():
+    configure_trueskill(**TRUESKILL_SETTINGS)
     bot.run(TOKEN)
 
 

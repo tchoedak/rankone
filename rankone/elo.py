@@ -15,23 +15,20 @@ class EloSystem:
 
     def persist_elos(self):
         '''
-		TODO: implement a way to update the DB from the cache.
-		'''
+        TODO: implement a way to update the DB from the cache.
+        '''
         raise NotImplementedError
 
     def refresh_elos(self):
         '''
-		TODO: implement a way to refresh the cache from the DB.
-		'''
+        TODO: implement a way to refresh the cache from the DB.
+        '''
         raise NotImplementedError
 
     def calculate_elo_gains(self, winning_team, losing_team):
         '''
-		Calculates elo gains for winning and losing teams using `EloSystem.algorithm`
-		'''
-        win_elo, lose_elo = self.algorithm(winning_team, losing_team)
+        Calculates elo gains for winning and losing teams using `EloSystem.algorithm`
+        '''
+        winning_team, losing_team = self.algorithm(winning_team, losing_team)
 
-        # ensure mins are met:
-        win_elo = max(win_elo, self.elo_gain_limit)
-        lose_elo = min(lose_elo, -self.elo_gain_limit)
-        return win_elo, lose_elo
+        return winning_team, losing_team

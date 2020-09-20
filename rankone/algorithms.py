@@ -1,3 +1,19 @@
+from trueskill import TrueSkill
+
+
+trueskill = TrueSkill()
+
+
+def configure_trueskill(mu=None, sigma=None, beta=None, tau=None):
+    '''
+    Configure `TrueSkill` with different settings.
+    '''
+    trueskill.mu = mu or trueskill.mu
+    trueskill.sigma = sigma or trueskill.sigma
+    trueskill.beta = beta or trueskill.beta
+    trueskill.tau = tau or trueskill.tau
+
+
 def threshold_elo_gains(team1, team2):
     '''
     Returns 40, -40 elo gains IF the respective teams
@@ -43,3 +59,27 @@ def elo_gains_v1(team1, team2):
     team2_shared_loss = (r2 - team2.combined_elo) / len(team2.players)
 
     return team1_shared_win, team2_shared_loss
+
+
+def true_skill_ratings(winning_team, losing_team):
+    '''
+    Returns winning team and losing team with adjusted ratings, elo, and sigma
+    '''
+
+    rankings = [0, 1]
+    rating_groups = [winning_team.ratings, losing_team.ratings]
+
+    winner_adjusted_ratings, loser_adjusted_ratings = trueskill.rate(
+        rating_groups, rankings
+    )
+    for i, rating in enumerate(winner_adjusted_ratings):
+        winning_team.players[i]._rating = rating
+        winning_team.players[i]._elo = rating.mu
+        winning_team.players[i]._sigma = rating.sigma
+
+    for i, rating in enumerate(loser_adjusted_ratings):
+        losing_team.players[i]._rating = rating
+        losing_team.players[i]._elo = rating.mu
+        losing_team.players[i]._sigma = rating.sigma
+
+    return winning_team, losing_team
