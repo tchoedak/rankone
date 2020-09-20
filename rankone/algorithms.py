@@ -67,4 +67,3 @@ def true_skill_ratings(winning_team, losing_team):
         losing_team.players[i]._sigma = rating.sigma
 
     return winning_team, losing_team
-
