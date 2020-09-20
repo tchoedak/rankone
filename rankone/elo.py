@@ -29,9 +29,6 @@ class EloSystem:
         '''
 		Calculates elo gains for winning and losing teams using `EloSystem.algorithm`
 		'''
-        win_elo, lose_elo = self.algorithm(winning_team, losing_team)
+        winning_team, losing_team = self.algorithm(winning_team, losing_team)
 
-        # ensure mins are met:
-        win_elo = max(win_elo, self.elo_gain_limit)
-        lose_elo = min(lose_elo, -self.elo_gain_limit)
-        return win_elo, lose_elo
+        return winning_team, losing_team
