@@ -17,7 +17,7 @@ MONITORED_GAME_MODES = ['4v4']
 
 STARTING_ELO = 1400
 STARTING_SIGMA = 300
-TRUESKILL_SETTINGS = {'BETA': 500}  # this was chosen from simulations
+TRUESKILL_SETTINGS = {'beta': 500}  # this was chosen from simulations
 
 
 # CHANNEL_ID of the channel where any channel level logs will go
