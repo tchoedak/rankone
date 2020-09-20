@@ -1,4 +1,9 @@
 from .algorithms import elo_gains_v1
+from . import config
+from trueskill import TrueSkill
+
+
+TrueSkill = 
 
 
 class EloSystem:
@@ -15,20 +20,20 @@ class EloSystem:
 
     def persist_elos(self):
         '''
-		TODO: implement a way to update the DB from the cache.
-		'''
+        TODO: implement a way to update the DB from the cache.
+        '''
         raise NotImplementedError
 
     def refresh_elos(self):
         '''
-		TODO: implement a way to refresh the cache from the DB.
-		'''
+        TODO: implement a way to refresh the cache from the DB.
+        '''
         raise NotImplementedError
 
     def calculate_elo_gains(self, winning_team, losing_team):
         '''
-		Calculates elo gains for winning and losing teams using `EloSystem.algorithm`
-		'''
+        Calculates elo gains for winning and losing teams using `EloSystem.algorithm`
+        '''
         winning_team, losing_team = self.algorithm(winning_team, losing_team)
 
         return winning_team, losing_team

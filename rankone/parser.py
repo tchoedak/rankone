@@ -9,8 +9,8 @@ from . import config
 
 def is_match(message_content):
     '''
-	Returns True if it is a match
-	'''
+    Returns True if it is a match
+    '''
     if 'teams have been selected:' in message_content.lower():
         return True
     else:
@@ -31,8 +31,8 @@ def is_monitored_match(mentions):
 
 def parse_match(message_id, content, mentions):
     '''
-	parses players, teams, and match id from a message
-	'''
+    parses players, teams, and match id from a message
+    '''
     match_id = message_id
     players = []
     red_players = []

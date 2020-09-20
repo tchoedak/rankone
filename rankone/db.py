@@ -57,9 +57,9 @@ session = get_session()
 
 def add_match(red, blue, message_id, match_created_at):
     '''
-	Given a `red` and `blue` team and a `message_id` responsible for
-	creating the match, add the match to the DB.
-	'''
+    Given a `red` and `blue` team and a `message_id` responsible for
+    creating the match, add the match to the DB.
+    '''
     now = datetime.now()
 
     for player in red.players:
@@ -89,8 +89,8 @@ def add_match(red, blue, message_id, match_created_at):
 
 def set_winner(match_id, winning_team):
     '''
-	Given a match_id, set all players belonging to `winning_team` as winners.
-	'''
+    Given a match_id, set all players belonging to `winning_team` as winners.
+    '''
     win = {'win': True}
     lose = {'win': False}
 
@@ -142,8 +142,8 @@ def show_players():
 
 def register_players(players):
     '''
-	Checks if players exist in Player table. If not, adds them to the Player table.
-	'''
+    Checks if players exist in Player table. If not, adds them to the Player table.
+    '''
     for player in players:
         instance = session.query(Player).filter(Player.id == player.player_id).first()
         if not instance:
@@ -156,8 +156,8 @@ def register_players(players):
 def update_player_elo(players):
     '''
     Updates the database with the latest player.elo, and player.sigma
-	for every player in `players`.
-	'''
+    for every player in `players`.
+    '''
     for player in players:
         db_player = session.query(Player).filter(Player.id == player.player_id).first()
         if db_player:
