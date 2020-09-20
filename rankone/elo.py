@@ -1,9 +1,4 @@
 from .algorithms import elo_gains_v1
-from . import config
-from trueskill import TrueSkill
-
-
-TrueSkill = 
 
 
 class EloSystem:
