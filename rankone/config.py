@@ -5,7 +5,8 @@ GUILD_ID = int(os.getenv('DISCORD_GUILD_ID'))
 TOKEN = os.getenv('DISCORD_TOKEN')
 ADMIN_ROLE = os.getenv('DISCORD_ADMIN_ROLE')
 
-monitored_reactions = {'🔴': 'Red', '🔵': 'Blue'}
+MONITORED_REACTIONS = {'🔴': 'Red', '🔵': 'Blue'}
+MATCH_REACTION = "\U00002694"  # Unicode for :crossed_swords:
 
 # CHANNEL_ID(s) of channels that the bot will monitor match messages and match reaction events
 MONITORED_CHANNELS = [

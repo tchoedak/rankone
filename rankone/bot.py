@@ -68,6 +68,8 @@ async def on_message(message):
         if parser.is_match(message.content.lower()) and parser.is_monitored_match(
             message.mentions
         ):
+            await message.add_reaction(config.MATCH_REACTION)
+
             match_id, players, teams = parser.parse_match(
                 message.id, message.content, message.mentions
             )
@@ -91,7 +93,7 @@ async def on_reaction_add(reaction, user):
         reaction.message.channel.id in config.MONITORED_CHANNELS
         and parser.is_monitored_match(reaction.message.mentions)
     ):
-        winning_team = config.monitored_reactions.get(reaction.emoji)
+        winning_team = config.MONITORED_REACTIONS.get(reaction.emoji)
         if winning_team:
 
             match_id = reaction.message.id
@@ -100,8 +102,9 @@ async def on_reaction_add(reaction, user):
             match_winner = db.get_match_winner(match_id)
             if not match_winner or match_winner.team != winning_team:
                 losing_team = (
-                    set(config.monitored_reactions.values()) - set([winning_team])
+                    set(config.MONITORED_REACTIONS.values()) - set([winning_team])
                 ).pop()
+
                 db.set_winner(match_id, winning_team)
 
                 match_id, players, teams = parser.parse_match(
