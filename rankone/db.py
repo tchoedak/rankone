@@ -1,6 +1,7 @@
 from datetime import datetime
 import pandas as pd
 import uuid
+from typing import List
 
 from sqlalchemy.engine.url import URL
 from sqlalchemy.schema import Column
@@ -12,6 +13,7 @@ from sqlalchemy import update
 
 
 from . import config
+from .player import Team
 
 
 sqlite_db = {'drivername': 'sqlite', 'database': 'db.sqlite'}
@@ -55,7 +57,9 @@ def get_session():
 session = get_session()
 
 
-def add_match(red, blue, message_id, match_created_at):
+def add_match(
+    red: Team, blue: Team, message_id: int, match_created_at: datetime
+) -> bool:
     '''
     Given a `red` and `blue` team and a `message_id` responsible for
     creating the match, add the match to the DB.
@@ -87,7 +91,7 @@ def add_match(red, blue, message_id, match_created_at):
     return True
 
 
-def set_winner(match_id, winning_team):
+def set_winner(match_id: int, winning_team: str) -> bool:
     '''
     Given a match_id, set all players belonging to `winning_team` as winners.
     '''
@@ -105,23 +109,23 @@ def set_winner(match_id, winning_team):
     return True
 
 
-def get_match(match_id):
+def get_match(match_id: int) -> Match:
     match = session.query(Match).filter(Match.match_id == match_id)
     return match
 
 
-def get_match_winner(match_id):
+def get_match_winner(match_id: int) -> Match:
     match = get_match(match_id)
     winner = match.filter(Match.win == True).distinct().first()
     return winner
 
 
-def get_player(player_id):
+def get_player(player_id: int) -> Player:
     player = session.query(Player).filter(Player.id == player_id).first()
     return player
 
 
-def add_player(player_id, name):
+def add_player(player_id: int, name: str) -> Player:
     player = Player(id=player_id, name=name, updated_at=datetime.now())
     session.add(player)
     session.commit()
@@ -140,7 +144,7 @@ def show_players():
     print(df[['id', 'name', 'elo', 'sigma']])
 
 
-def register_players(players):
+def register_players(players: Player) -> bool:
     '''
     Checks if players exist in Player table. If not, adds them to the Player table.
     '''
@@ -153,7 +157,7 @@ def register_players(players):
     return True
 
 
-def update_player_elo(players):
+def update_player_elo(players: List[Player]) -> bool:
     '''
     Updates the database with the latest player.elo, and player.sigma
     for every player in `players`.
@@ -167,7 +171,7 @@ def update_player_elo(players):
     return True
 
 
-def reset_all_elo():
+def reset_all_elo() -> bool:
     '''
     Reset elo and sigma for ALL players.
     '''
@@ -184,6 +188,6 @@ def reset_all_elo():
     return True
 
 
-def get_top_n_players(n):
+def get_top_n_players(n: int) -> List[Player]:
     top_players = session.query(Player).order_by(Player.elo.desc()).limit(n)
     return top_players.all()
