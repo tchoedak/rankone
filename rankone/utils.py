@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 import subprocess
+from typing import List
 
 from discord import Member
 from discord import utils as discord_utils
