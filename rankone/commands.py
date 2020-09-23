@@ -102,3 +102,8 @@ class Commands(commands.Cog):
                 ctx.guild.members, player_id=int(player.id)
             )
         await ctx.send(reporter.get_leader_report(leaders))
+
+    @commands.command(name='elo_loser')
+    async def elo_loser(self, ctx):
+        loser = random.choice(['f00l', 'FlyingLizard', 'LA Clippers'])
+        await ctx.send(reporter.as_bot(loser))
