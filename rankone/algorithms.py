@@ -18,7 +18,7 @@ def configure_trueskill(
     trueskill.tau = tau or trueskill.tau
 
 
-def threshold_elo_gains(team1: Team, team2: Team) -> Tuple(int, int):
+def threshold_elo_gains(team1: Team, team2: Team) -> Tuple[Team, Team]:
     '''
     Returns 40, -40 elo gains IF the respective teams
     have less than 100 total combined games. Otherwise
@@ -33,14 +33,26 @@ def threshold_elo_gains(team1: Team, team2: Team) -> Tuple(int, int):
     if team2.combined_weight < 100:
         team2_elo = -40
 
-    return team1_elo, team2_elo
+    for player in team1.players:
+        player._elo = player.elo + team1_elo
+
+    for player in team2.players:
+        player._elo = player.elo + team2_elo
+
+    return team1, team2
 
 
-def basic_elo_gains(team1: Team, team2: Team) -> Tuple(int, int):
-    return 15, -15
+def basic_elo_gains(team1: Team, team2: Team) -> Tuple[Team, Team]:
+    for player in team1.players:
+        player._elo = player.elo + 15
+
+    for player in team2.players:
+        player._elo = player.elo - 15
+
+    return team1, team2
 
 
-def elo_gains_v1(team1: Team, team2: Team) -> Tuple(int, int):
+def elo_gains_v1(team1: Team, team2: Team) -> Tuple[Team, Team]:
     '''
     Calculates using an ELO formula but does not take into account
     the number of games.
@@ -62,7 +74,13 @@ def elo_gains_v1(team1: Team, team2: Team) -> Tuple(int, int):
     team1_shared_win = (r1 - team1.combined_elo) / len(team1.players)
     team2_shared_loss = (r2 - team2.combined_elo) / len(team2.players)
 
-    return team1_shared_win, team2_shared_loss
+    for player in team1.players:
+        player._elo = player.elo + team1_shared_win
+
+    for player in team2.players:
+        player._elo = player.elo + team1_shared_loss
+
+    return team1, team2
 
 
 def true_skill_ratings(winning_team: Team, losing_team: Team) -> Tuple[Team, Team]:
