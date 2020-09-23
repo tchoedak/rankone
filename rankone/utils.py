@@ -1,24 +1,26 @@
 from datetime import datetime
 import os
 import subprocess
+from typing import List
 
+from discord import Member
 from discord import utils as discord_utils
 
 from . import db
 
 
 class BackUp(object):
-    def __init__(self, backup_id=None):
+    def __init__(self, backup_id: str = None):
         self.backup_id = backup_id or datetime.now().strftime('%Y%m%d.%H.%M.%S')
         self.db_prefix = 'db.'
         self.backup_path = self.db_prefix + self.backup_id
 
     @property
-    def exists(self):
+    def exists(self) -> bool:
         return os.path.exists(self.backup_path)
 
 
-def backup_db(backup_id=None):
+def backup_db(backup_id: str = None) -> str:
     bk_up = BackUp(backup_id)
     cmd = ['cp', db.sqlite_db['database'], bk_up.backup_path]
     print(cmd)
@@ -26,7 +28,7 @@ def backup_db(backup_id=None):
     return bk_up.backup_id
 
 
-def restore_db(backup_id):
+def restore_db(backup_id: str) -> str:
     bk_up = BackUp(backup_id)
     if bk_up.exists:
         new_bk_id = backup_db()
@@ -41,13 +43,13 @@ def restore_db(backup_id):
     return response
 
 
-def reset_db():
+def reset_db() -> int:
     cmd = ['rm', db.sqlite_db['database']]
     result = subprocess.call(cmd) == 0
     db.session = db.get_session()
     return result
 
 
-def get_display_name(members, player_id):
+def get_display_name(members: List[Member], player_id: int) -> str:
     member = discord_utils.get(members, id=player_id)
     return member.display_name

@@ -1,14 +1,21 @@
-from . import db
+from typing import List
 from trueskill import Rating
+from . import db
 
 
-def avg(items):
+def avg(items: List[int]) -> float:
     return sum(items) / len(items)
 
 
 class Player(object):
     def __init__(
-        self, player_id, name, elo=None, number_of_games=None, rating=None, sigma=None
+        self,
+        player_id: int,
+        name: str,
+        elo: int = None,
+        number_of_games: int = None,
+        rating: Rating = None,
+        sigma: float = None,
     ):
         self.player_id = player_id
         self.name = name
@@ -18,7 +25,7 @@ class Player(object):
         self._rating = rating
 
     @property
-    def elo(self):
+    def elo(self) -> int:
         '''
         Returns the player's current Elo from ranked games
         '''
@@ -28,7 +35,7 @@ class Player(object):
             return db.get_player(self.player_id).elo
 
     @property
-    def number_of_games(self):
+    def number_of_games(self) -> int:
         '''
         Returns the number of ranked games the player has played.
         '''
@@ -38,14 +45,14 @@ class Player(object):
         return f'<{self.name} id: {self.player_id}>'
 
     @property
-    def sigma(self):
+    def sigma(self) -> float:
         if self._sigma:
             return self._sigma
         else:
             return db.get_player(self.player_id).sigma
 
     @property
-    def rating(self):
+    def rating(self) -> Rating:
         if self._rating:
             return self._rating
         else:
@@ -61,20 +68,20 @@ class Team(object):
         self.players = players
 
     @property
-    def combined_elo(self):
+    def combined_elo(self) -> int:
         return sum([player.elo for player in self.players])
 
     @property
-    def average_elo(self):
+    def average_elo(self) -> float:
         return avg([player.elo for player in self.players])
 
     @property
-    def combined_weight(self):
+    def combined_weight(self) -> int:
         return sum([player.number_of_games for player in self.players])
 
     @property
-    def ratings(self):
+    def ratings(self) -> List[Rating]:
         return [player.rating for player in self.players]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return ', '.join([str(player) for player in self.players])

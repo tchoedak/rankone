@@ -34,6 +34,17 @@ class Commands(commands.Cog):
         response = utils.restore_db(backup_id)
         await ctx.send(reporter.as_bot(response))
 
+    @commands.command(name='reset_db')
+    @commands.has_any_role(config.ADMIN_ROLE)
+    async def reset_db(self, ctx):
+        backup_id = utils.backup_db()
+        response = f'Backup {backup_id} created first before resetting elo\n'
+        if utils.reset_db():
+            response = response + 'DB reset.'
+        else:
+            response = response = 'Unable to reset DB'
+        await ctx.send(reporter.as_bot(response))
+
     @commands.command(name='myelo')
     async def myelo(self, ctx):
         player_id, name = ctx.author.id, ctx.author.name
@@ -68,17 +79,6 @@ class Commands(commands.Cog):
                 report = reporter.as_bot("Players don't exist")
 
             await ctx.send(report)
-
-    @commands.command(name='reset_db')
-    @commands.has_any_role(config.ADMIN_ROLE)
-    async def reset_db(self, ctx):
-        backup_id = utils.backup_db()
-        response = f'Backup {backup_id} created first before resetting elo\n'
-        if utils.reset_db():
-            response = response + 'DB reset.'
-        else:
-            response = response = 'Unable to reset DB'
-        await ctx.send(reporter.as_bot(response))
 
     @commands.command(name='reset_elo')
     @commands.has_any_role(config.ADMIN_ROLE)
