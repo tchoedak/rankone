@@ -2,41 +2,33 @@ import os
 import random
 import logging
 
-import discord
+from discord import Message, Reaction, User, utils as discord_utils
 from discord.ext import commands
 
 from .logger import get_logger
 from .commands import Commands
 from .elo import EloSystem
-from .algorithms import elo_gains_v1, true_skill_ratings
+from .algorithms import true_skill_ratings
 from . import reporter
 from . import db
 from . import config
 from . import parser
 from . import utils
+from .callbacks import send_to_reaction_channel, send_to_message_channel
+from .match import MatchManager
 
 
 logger = get_logger(logging.INFO)
 
 bot = commands.Bot(command_prefix='.')
 bot.add_cog(Commands(bot))
-elo = EloSystem(algorithm=true_skill_ratings)
-
-
-async def send_to_log_channel(message):
-    log_channel = bot.get_channel(config.LOG_CHANNEL)
-    await log_channel.send(config.BOT_MESSAGE_PREFIX + message)
-
-
-async def send_to_debug_channel(message):
-    debug_channel = bot.get_channel(config.DEBUG_CHANNEL)
-    await debug_channel.send(message)
+true_skill_system = EloSystem(algorithm=true_skill_ratings)
+match_manager = MatchManager(true_skill_system)
 
 
 @bot.event
 async def on_ready():
-    guild = discord.utils.get(bot.guilds, id=config.GUILD_ID)
-
+    guild = discord_utils.get(bot.guilds, id=config.GUILD_ID)
     print(
         f'{bot.user} is connected to the following guild:\n'
         f'{guild.name}(id: {guild.id})'
@@ -44,88 +36,36 @@ async def on_ready():
 
 
 @bot.event
-async def on_message(message):
+async def on_message(message: Message):
     if message.author == bot.user:
         return
 
-    logging.info(
-        f'author: {message.author}\n'
-        f'author_type: {type(message.author)}\n'
-        f'content: {message.content}\n'
-        f'content_type: {type(message.content)}\n'
-        f'channel: {message.channel}\n'
-        f'channel_type: {type(message.channel)}\n'
-        f'mentions: {message.mentions}\n'
-        f'mentions_type: {type(message.mentions)}\n'
-        f'id: {message.id}\n'
-        f'id_type: {type(message.id)}\n'
-        f'created_at: {str(message.created_at)}\n'
-        f'created_type: {type(message.created_at)}\n'
-    )
+    if config.DEBUG_MODE:
+        logger.info(
+            f'author: {message.author}\n'
+            f'author_type: {type(message.author)}\n'
+            f'content: {message.content}\n'
+            f'content_type: {type(message.content)}\n'
+            f'channel: {message.channel}\n'
+            f'channel_type: {type(message.channel)}\n'
+            f'mentions: {message.mentions}\n'
+            f'mentions_type: {type(message.mentions)}\n'
+            f'id: {message.id}\n'
+            f'id_type: {type(message.id)}\n'
+            f'created_at: {str(message.created_at)}\n'
+            f'created_type: {type(message.created_at)}\n'
+        )
 
     if message.channel.id in config.MONITORED_CHANNELS:
         await bot.process_commands(message)
-        if parser.is_match(message.content.lower()) and parser.is_monitored_match(
-            message.mentions
-        ):
-            await message.add_reaction(config.MATCH_REACTION)
 
-            match_id, players, teams = parser.parse_match(
-                message.id, message.content, message.mentions
-            )
-            match_created_at = message.created_at
-            db.add_match(teams['Red'], teams['Blue'], match_id, match_created_at)
-            db.register_players(teams['Red'].players + teams['Blue'].players)
-            match_added_message = reporter.as_bot(
-                f"Matched added! match_id [{match_id}]. Red: {teams['Red']}. Blue: [{teams['Blue']}]"
-            )
-            if config.DEBUG_MODE:
-                await send_to_debug_channel(match_added_message)
-            else:
-                await send_to_log_channel(
-                    f"Matched added! match_id: [{match_id}]. Red: [{teams['Red']}]. Blue: [{teams['Blue']}]"
-                )
+        if match_manager.is_match(message):
+            await match_manager.add_match(message, callbacks=[send_to_message_channel])
 
 
 @bot.event
-async def on_reaction_add(reaction, user):
-    if (
-        reaction.message.channel.id in config.MONITORED_CHANNELS
-        and parser.is_monitored_match(reaction.message.mentions)
+async def on_reaction_add(reaction: Reaction, user: User):
+    if match_manager.is_match(reaction.message) and match_manager.is_match_reaction(
+        reaction
     ):
-        winning_team = config.MONITORED_REACTIONS.get(reaction.emoji)
-        if winning_team:
-
-            match_id = reaction.message.id
-
-            # check if match already has a winner
-            match_winner = db.get_match_winner(match_id)
-            if not match_winner or match_winner.team != winning_team:
-                losing_team = (
-                    set(config.MONITORED_REACTIONS.values()) - set([winning_team])
-                ).pop()
-
-                db.set_winner(match_id, winning_team)
-
-                match_id, players, teams = parser.parse_match(
-                    reaction.message.id,
-                    reaction.message.content,
-                    reaction.message.mentions,
-                )
-
-                winning_team, losing_team = elo.calculate_elo_gains(
-                    teams[winning_team], teams[losing_team]
-                )
-                db.update_player_elo(winning_team.players)
-                db.update_player_elo(losing_team.players)
-
-                for player in players:
-                    player.display_name = utils.get_display_name(
-                        reaction.message.guild.members, player.player_id
-                    )
-
-                elo_report_message = reporter.get_elo_report(*players, has_updated=True)
-                if config.DEBUG_MODE:
-                    await send_to_debug_channel(elo_report_message)
-                else:
-                    await reaction.message.channel.send(elo_report_message)
+        await match_manager.update_match(reaction, callbacks=[send_to_reaction_channel])
