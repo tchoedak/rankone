@@ -191,3 +191,8 @@ def reset_all_elo() -> bool:
 def get_top_n_players(n: int) -> List[Player]:
     top_players = session.query(Player).order_by(Player.elo.desc()).limit(n)
     return top_players.all()
+
+
+def get_bottom_n_players(n: int) -> List[Player]:
+    bottom_players = session.query(Player).order_by(Player.elo.asc()).limit(n)
+    return bottom_players.all()

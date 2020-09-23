@@ -107,3 +107,13 @@ class Commands(commands.Cog):
     async def elo_loser(self, ctx):
         loser = random.choice(['f00l', 'FlyingLizard', 'LA Clippers'])
         await ctx.send(reporter.as_bot(loser))
+
+    @commands.command(name='elo_losers')
+    async def elo_losers(self, ctx):
+        bottom_limit = 10
+        losers = db.get_bottom_n_players(bottom_limit)
+        for player in losers:
+            player.display_name = utils.get_display_name(
+                ctx.guild.members, player_id=int(player.id)
+            )
+        await ctx.send(reporter.get_leader_report(losers))
