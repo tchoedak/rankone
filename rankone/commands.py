@@ -105,7 +105,16 @@ class Commands(commands.Cog):
 
     @commands.command(name='elo_loser')
     async def elo_loser(self, ctx):
-        loser = random.choice(['f00l', 'FlyingLizard', 'LA Clippers'])
+        loser = random.choice(
+            [
+                'f00l',
+                'US stock market',
+                'LA Clippers',
+                'Boston Celtics',
+                'You',
+                'Disneys Mulan',
+            ]
+        )
         await ctx.send(reporter.as_bot(loser))
 
     @commands.command(name='elo_losers')
