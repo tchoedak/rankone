@@ -24,6 +24,9 @@ class BackUp(object):
 
 
 def backup_db(backup_id: str = None) -> str:
+    '''
+    Backup the database.
+    '''
     bk_up = BackUp(backup_id)
     cmd = ['cp', db.sqlite_db['database'], bk_up.backup_path]
     print(cmd)
@@ -32,6 +35,9 @@ def backup_db(backup_id: str = None) -> str:
 
 
 def restore_db(backup_id: str) -> str:
+    '''
+    Restore an existing database.
+    '''
     bk_up = BackUp(backup_id)
     if bk_up.exists:
         new_bk_id = backup_db()
@@ -47,6 +53,9 @@ def restore_db(backup_id: str) -> str:
 
 
 def reset_db() -> int:
+    '''
+    Reset the database by removing the DB file and creating a new session.
+    '''
     cmd = ['rm', db.sqlite_db['database']]
     result = subprocess.call(cmd) == 0
     db.session = db.get_session()
@@ -54,11 +63,18 @@ def reset_db() -> int:
 
 
 def get_display_name(members: List[Member], player_id: int) -> str:
+    '''
+    Get a player's discord display name from discord's API.
+    '''
     member = discord_utils.get(members, id=player_id)
     return member.display_name
 
 
 def get_team1_win_probability(team1, team2):
+    '''
+    Calculate the probability of `team1` winning against `team2.
+    The formula is copied from https://trueskill.org/#win-probability
+    '''
     delta_mu = sum(player.elo for player in team1.players) - sum(
         player.elo for player in team2.players
     )
