@@ -33,6 +33,12 @@ Get elo of `discordmember` and `discordmember2`
 ### .elo_leaders
 Get the elo leaderboard
 
+### .elo_loser
+Get the biggest loserr
+
+### .version
+Get the current version of the bot running
+
 ## Admin commands
 
 ### .reset_elo
