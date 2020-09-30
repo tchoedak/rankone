@@ -2,10 +2,13 @@ from datetime import datetime
 import os
 import subprocess
 from typing import List
+import itertools
+import math
 
 from discord import Member
 from discord import utils as discord_utils
 
+from .algorithms import trueskill
 from . import db
 
 
@@ -53,3 +56,15 @@ def reset_db() -> int:
 def get_display_name(members: List[Member], player_id: int) -> str:
     member = discord_utils.get(members, id=player_id)
     return member.display_name
+
+
+def get_team1_win_probability(team1, team2):
+    delta_mu = sum(player.elo for player in team1.players) - sum(
+        player.elo for player in team2.players
+    )
+    sum_sigma = sum(
+        player.sigma ** 2 for player in itertools.chain(team1.players, team2.players)
+    )
+    size = len(team1.players) + len(team2.players)
+    denom = math.sqrt(size * (trueskill.beta * trueskill.beta) + sum_sigma)
+    return trueskill.cdf(delta_mu / denom)

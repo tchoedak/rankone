@@ -90,10 +90,20 @@ class MatchManager(object):
         red_players = self.update_player_display_names(teams['Red'].players, message)
         blue_players = self.update_player_display_names(teams['Blue'].players, message)
 
+        red_win_probability = get_team1_win_probability(teams['Red'], teams['Blue'])
+        blue_win_probability = 1 - red_win_probability
+        if red_win_probability > blue_win_probability:
+            favored_team = 'Red'
+            percent_win = red_win_probability * 100
+        else:
+            favored_team = 'Blue'
+            percent_win = blue_win_probability * 100
+
         report = reporter.as_bot(
             f'Match added! match_id: {match_id}. '
             f'Red: {[player.display_name for player in red_players]}. '
             f'Blue: {[player.display_name for player in blue_players]}.'
+            f'Probability of {favored_team} winning is {percent_win}%.'
         )
 
         for callback in callbacks:
