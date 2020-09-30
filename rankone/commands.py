@@ -6,6 +6,7 @@ from . import db
 from . import config
 from . import utils
 from . import reporter
+from . import version
 
 
 class Commands(commands.Cog):
@@ -126,3 +127,7 @@ class Commands(commands.Cog):
                 ctx.guild.members, player_id=int(player.id)
             )
         await ctx.send(reporter.get_leader_report(losers))
+
+    @commands.command(name='version')
+    async def version(self, ctx):
+        await ctx.send(reporter.as_bot(version.VERSION))

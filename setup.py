@@ -1,5 +1,6 @@
 import pathlib
 from setuptools import setup, find_packages
+from rankone.version import VERSION
 
 
 pkgs = ['rankone.%s' % s for s in find_packages('./rankone')]
@@ -13,7 +14,7 @@ with open('requirements.txt', 'r') as f:
 
 setup(
     name='rankone',
-    version='1.1.5',
+    version=VERSION,
     packages=pkgs,
     description='RankOne is a discord bot that manages a Elo ladder for pickup games.',
     long_description=README,
